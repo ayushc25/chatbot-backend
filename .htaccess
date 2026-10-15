@@ -1,0 +1,21 @@
+# ==============================================================================
+# MILESWEB / CPANEL REVERSE PROXY TO FASTAPI (UVICORN PORT 8000)
+# ==============================================================================
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Don't proxy existing static files/directories if needed
+    # RewriteCond %{REQUEST_FILENAME} -f [OR]
+    # RewriteCond %{REQUEST_FILENAME} -d
+    # RewriteRule ^ - [L]
+
+    # Forward all traffic to Uvicorn running on 127.0.0.1:8000
+    RewriteRule ^(.*)$ http://127.0.0.1:8000/$1 [P,L]
+</IfModule>
+
+<IfModule mod_proxy.c>
+    ProxyPreserveHost On
+    ProxyPassReverse / http://127.0.0.1:8000/
+</IfModule>
