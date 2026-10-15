@@ -1,12 +1,14 @@
 # ==============================================================================
-# MILESWEB FASTAPI BACKEND REVERSE PROXY (.htaccess)
+# MILESWEB FASTAPI BACKEND ROUTING (.htaccess)
 # ==============================================================================
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteBase /
 
-    # Route all incoming requests to the index.php proxy bridge
-    RewriteCond %{REQUEST_URI} !^/index\.php
-    RewriteRule ^(.*)$ index.php [QSA,L]
+    # Prevent loop on index.php
+    RewriteRule ^index\.php$ - [L]
+
+    # Route all API requests directly to root /index.php
+    RewriteRule ^(.*)$ /index.php [QSA,L]
 </IfModule>
