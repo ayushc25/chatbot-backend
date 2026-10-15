@@ -1,16 +1,12 @@
 # ==============================================================================
-# MILESWEB / CPANEL REVERSE PROXY TO FASTAPI (UVICORN PORT 8000)
+# MILESWEB FASTAPI BACKEND REVERSE PROXY (.htaccess)
 # ==============================================================================
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteBase /
 
-    # Don't proxy existing files or directories
-    RewriteCond %{REQUEST_FILENAME} -f [OR]
-    RewriteCond %{REQUEST_FILENAME} -d
-    RewriteRule ^ - [L]
-
-    # Route through PHP proxy bridge to reach Uvicorn (FastAPI) on 127.0.0.1:8000
+    # Route all incoming requests to the index.php proxy bridge
+    RewriteCond %{REQUEST_URI} !^/index\.php
     RewriteRule ^(.*)$ index.php [QSA,L]
 </IfModule>

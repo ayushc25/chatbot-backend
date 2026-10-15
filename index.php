@@ -16,7 +16,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 $backend_host = 'http://127.0.0.1:8000';
-$request_uri = $_SERVER['REQUEST_URI'];
+$request_uri = $_SERVER['REQUEST_URI'] ?? '/';
+// Strip /index.php prefix if passed by rewrite engine
+$request_uri = preg_replace('#^/index\.php#i', '', $request_uri);
+if (empty($request_uri)) {
+    $request_uri = '/';
+}
 $target_url = $backend_host . $request_uri;
 
 $ch = curl_init($target_url);
