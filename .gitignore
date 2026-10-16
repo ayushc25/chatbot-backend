@@ -17,10 +17,7 @@ __pycache__/
 *.pyo
 *.pyd
 
-# SQLite Database
-*.db
-*.sqlite
-*.sqlite3
+
 
 # Logs
 *.log
