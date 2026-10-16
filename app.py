@@ -56,6 +56,7 @@ app.add_middleware(
 class SignUpRequest(BaseModel):
     email: str
     password: str = Field(min_length=8, max_length=128)
+    is_18_plus: bool = Field(default=False)
 
 
 class VerifyEmailRequest(BaseModel):
@@ -199,6 +200,11 @@ def init_db() -> None:
 
         try:
             conn.execute("ALTER TABLE chat_messages ADD COLUMN reactions TEXT DEFAULT '{}'")
+        except Exception:
+            pass
+
+        try:
+            conn.execute("ALTER TABLE users ADD COLUMN is_18_plus INTEGER NOT NULL DEFAULT 0")
         except Exception:
             pass
 
@@ -349,6 +355,11 @@ def root():
 @app.post("/auth/signup")
 def signup(req: SignUpRequest):
     cleanup_expired_data()
+    if not req.is_18_plus:
+        raise HTTPException(
+            status_code=400,
+            detail="You must be at least 18 years of age to register.",
+        )
     email = normalize_email(req.email)
     now = now_utc()
 
@@ -364,8 +375,8 @@ def signup(req: SignUpRequest):
         password_hash = hash_password(req.password)
         cursor = conn.execute(
             """
-            INSERT INTO users (email, password_hash, is_verified, created_at)
-            VALUES (?, ?, 1, ?)
+            INSERT INTO users (email, password_hash, is_verified, is_18_plus, created_at)
+            VALUES (?, ?, 1, 1, ?)
             """,
             (email, password_hash, isoformat_utc(now)),
         )
@@ -380,6 +391,7 @@ def signup(req: SignUpRequest):
             "id": user_id,
             "email": email,
             "is_verified": True,
+            "is_18_plus": True,
         },
     }
 
